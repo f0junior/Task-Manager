@@ -1,0 +1,11 @@
+{
+    "name": "fran/task-manager",
+    "description": "Task Manager com SOLID, Clean Code e PSR.",
+    "type": "project",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}
