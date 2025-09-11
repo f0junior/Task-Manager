@@ -35,8 +35,8 @@ final class TaskModel
             $this->id,
             $title,
             $this->description,
-            $this->status,
             $this->userId,
+            $this->status,
             $this->createdAt,
             new \DateTimeImmutable()
         );
@@ -48,8 +48,8 @@ final class TaskModel
             $this->id,
             $this->title,
             $description,
-            $this->status,
             $this->userId,
+            $this->status,
             $this->createdAt,
             new \DateTimeImmutable()
         );
@@ -61,8 +61,8 @@ final class TaskModel
             $this->id,
             $this->title,
             $this->description,
-            $status,
             $this->userId,
+            $status,
             $this->createdAt,
             new \DateTimeImmutable()
         );
