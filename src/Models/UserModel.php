@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Helpers\Validator;
+
 final class UserModel
 {
     private int $id;
@@ -15,6 +17,13 @@ final class UserModel
 
     public function __construct(int $id, string $name, string $email, string $hashPassword, \DateTimeImmutable $createdAt = null, \DateTimeImmutable $updatedAt = null)
     {
+        if (Validator::minLength($name, 3)) {
+            throw new \InvalidArgumentException("Name must be at least 3 characters long.");
+        }
+
+        if (!Validator::isValidEmail($email)) {
+            throw new \InvalidArgumentException("Invalid email format.");
+        }
 
         $this->id = $id;
         $this->name = $name;

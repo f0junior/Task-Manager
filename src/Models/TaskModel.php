@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Helpers\Validator;
 use App\Models\Status;
 
 final class TaskModel
@@ -18,6 +19,14 @@ final class TaskModel
 
     public function __construct(int $id, string $title, string $description, int $userId, Status $status = Status::PENDING, \DateTimeImmutable $createdAt = null, \DateTimeImmutable $updatedAt = null)
     {
+        if (!Validator::notEmptyString($title)) {
+            throw new \InvalidArgumentException("Title cannot be empty.");
+        }
+
+        if (Validator::maxLength($title, 255)) {
+            throw new \InvalidArgumentException("Title cannot exceed 255 characters.");
+        }
+
         $this->id = $id;
         $this->title = $title;
         $this->description = $description;
