@@ -1,0 +1,50 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Repositories\InMemory;
+
+use App\Models\UserModel as User;
+use App\Repositories\Contracts\UserRepositoryInterface;
+
+final class InMemoryUserRepository implements UserRepositoryInterface
+{
+    /** @var User[] */
+    private array $users = [];
+
+    private int $autoIncrement = 1;
+
+    public function findById(int $id): ?User
+    {
+        return $this->users[$id] ?? null;
+    }
+
+    public function findByEmail(string $email): ?User
+    {
+        foreach ($this->users as $user) {
+            if ($user->getEmail() === $email) {
+                return $user;
+            }
+        }
+        return null;
+    }
+
+    public function save(User $user): User
+    {
+        if ($user->getId() === 0) {
+            // Simula ID auto increment
+            $reflection = new \ReflectionClass($user);
+            $property = $reflection->getProperty('id');
+            $property->setAccessible(true);
+            $property->setValue($user, $this->autoIncrement++);
+        }
+
+        $this->users[$user->getId()] = $user;
+        return $user;
+    }
+
+    public function delete(int $id): void
+    {
+        unset($this->users[$id]);
+    }
+}
