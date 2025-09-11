@@ -16,7 +16,7 @@ final class TaskModel
     private \DateTimeImmutable $createdAt;
     private \DateTimeImmutable $updatedAt;
 
-    public function __construct(int $id, string $title, string $description, Status $status = Status::PENDING, int $userId, \DateTimeImmutable $createdAt = null, \DateTimeImmutable $updatedAt = null)
+    public function __construct(int $id, string $title, string $description, int $userId, Status $status = Status::PENDING, \DateTimeImmutable $createdAt = null, \DateTimeImmutable $updatedAt = null)
     {
         $this->id = $id;
         $this->title = $title;
