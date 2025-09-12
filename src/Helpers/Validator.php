@@ -18,11 +18,11 @@ final class Validator
 
     public static function minLength(string $value, int $min): bool
     {
-        return mb_strlen($value) < $min;
+        return mb_strlen($value) >= $min;
     }
 
     public static function maxLength(string $value, int $max): bool
     {
-        return mb_strlen($value) > $max;
+        return mb_strlen($value) <= $max;
     }
 }
