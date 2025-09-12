@@ -9,107 +9,115 @@ use App\Models\Status;
 
 final class TaskModel
 {
-    private int $id;
-    private string $title;
-    private string $description;
-    private Status $status;
-    private int $userId;
-    private \DateTimeImmutable $createdAt;
-    private \DateTimeImmutable $updatedAt;
+    public function __construct(
+        public readonly string $title,
+        public readonly string $description,
+        public readonly int $userId,
+        public readonly \DateTimeImmutable $createdAt,
+        public readonly \DateTimeImmutable $updatedAt,
+        public readonly Status $status = Status::PENDING,
+        public readonly ?int $id = null,
+    ) {
+    }
 
-    public function __construct(int $id, string $title, string $description, int $userId, Status $status = Status::PENDING, \DateTimeImmutable $createdAt = null, \DateTimeImmutable $updatedAt = null)
-    {
-        if (!Validator::notEmptyString($title)) {
-            throw new \InvalidArgumentException("Title cannot be empty.");
+    public static function create(
+        string $title,
+        string $description,
+        int $userId,
+        Status $status = Status::PENDING,
+    ): self {
+        self::validateTitle($title);
+
+        if (!Validator::maxLength($description, 255)) {
+            throw new \InvalidArgumentException("Description must not exceed 255 characters.");
         }
-
-        if (Validator::maxLength($title, 255)) {
-            throw new \InvalidArgumentException("Title cannot exceed 255 characters.");
-        }
-
-        $this->id = $id;
-        $this->title = $title;
-        $this->description = $description;
-        $this->status = $status;
-        $this->userId = $userId;
 
         $now = new \DateTimeImmutable();
-        $this->createdAt = $createdAt ?? $now;
-        $this->updatedAt = $updatedAt ?? $now;
+
+        return new self(
+            $title,
+            $description,
+            $userId,
+            $now,
+            $now,
+            $status,
+        );
+    }
+
+    public static function fromDatabase(
+        int $id,
+        string $title,
+        string $description,
+        int $userId,
+        Status $status,
+        \DateTimeImmutable $createdAt,
+        \DateTimeImmutable $updatedAt,
+    ): self {
+        return new self(
+            $title,
+            $description,
+            $userId,
+            $createdAt,
+            $updatedAt,
+            $status,
+            $id,
+        );
+    }
+
+    public static function validateTitle(string $title): void
+    {
+        if (!Validator::minLength($title, 3)) {
+            throw new \InvalidArgumentException("Title must be at least 3 characters long.");
+        }
+
+        if (!Validator::maxLength($title, 100)) {
+            throw new \InvalidArgumentException("Title must not exceed 100 characters.");
+        }
     }
 
     public function withTitle(string $title): self
     {
+        self::validateTitle($title);
+
         return new self(
-            $this->id,
             $title,
             $this->description,
             $this->userId,
-            $this->status,
             $this->createdAt,
-            new \DateTimeImmutable()
+            new \DateTimeImmutable(),
+            $this->status,
+            $this->id,
         );
     }
 
     public function withDescription(string $description): self
     {
+        if (!Validator::maxLength($description, 255)) {
+            throw new \InvalidArgumentException("Description must not exceed 255 characters.");
+        }
+
         return new self(
-            $this->id,
             $this->title,
             $description,
             $this->userId,
-            $this->status,
             $this->createdAt,
-            new \DateTimeImmutable()
+            new \DateTimeImmutable(),
+            $this->status,
+            $this->id,
         );
     }
 
     public function withStatus(Status $status): self
     {
         return new self(
-            $this->id,
             $this->title,
             $this->description,
             $this->userId,
-            $status,
             $this->createdAt,
-            new \DateTimeImmutable()
+            new \DateTimeImmutable(),
+            $status,
+            $this->id,
         );
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getTitle(): string
-    {
-        return $this->title;
-    }
-
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
-
-    public function getStatus(): Status
-    {
-        return $this->status;
-    }
-
-    public function getUserId(): int
-    {
-        return $this->userId;
-    }
-
-    public function getCreatedAt(): \DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function getUpdatedAt(): \DateTimeImmutable
-    {
-        return $this->updatedAt;
     }
 
     public function __toString(): string

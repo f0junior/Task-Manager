@@ -8,16 +8,19 @@ use App\Helpers\Validator;
 
 final class UserModel
 {
-    private int $id;
-    private string $name;
-    private string $email;
-    private string $hashPassword;
-    private \DateTimeImmutable $createdAt;
-    private \DateTimeImmutable $updatedAt;
+    public function __construct(
+        public readonly string $name,
+        public readonly string $email,
+        public readonly string $hashPassword,
+        public readonly \DateTimeImmutable $createdAt,
+        public readonly \DateTimeImmutable $updatedAt,
+        public readonly ?int $id = null,
+    ) {
+    }
 
-    public function __construct(int $id, string $name, string $email, string $hashPassword, \DateTimeImmutable $createdAt = null, \DateTimeImmutable $updatedAt = null)
+    public static function create(string $name, string $email, string $password): self
     {
-        if (Validator::minLength($name, 3)) {
+        if (!Validator::minLength($name, 3)) {
             throw new \InvalidArgumentException("Name must be at least 3 characters long.");
         }
 
@@ -25,80 +28,77 @@ final class UserModel
             throw new \InvalidArgumentException("Invalid email format.");
         }
 
-        $this->id = $id;
-        $this->name = $name;
-        $this->email = $email;
-        $this->hashPassword = $hashPassword;
-
         $now = new \DateTimeImmutable();
-        $this->createdAt = $createdAt ?? $now;
-        $this->updatedAt = $updatedAt ?? $now;
+
+        return new self(
+            $name,
+            $email,
+            password_hash($password, PASSWORD_BCRYPT),
+            $now,
+            $now,
+        );
+    }
+
+    public static function fromDatabase(
+        int $id,
+        string $name,
+        string $email,
+        string $hashPassword,
+        \DateTimeImmutable $createdAt,
+        \DateTimeImmutable $updatedAt,
+    ): self {
+        return new self(
+            $name,
+            $email,
+            $hashPassword,
+            $createdAt,
+            $updatedAt,
+            $id,
+        );
     }
 
     public function withName(string $name): self
     {
+        if (!Validator::minLength($name, 3)) {
+            throw new \InvalidArgumentException("Name must be at least 3 characters long.");
+        }
+
         return new self(
-            $this->id,
             $name,
             $this->email,
             $this->hashPassword,
             $this->createdAt,
-            new \DateTimeImmutable()
+            new \DateTimeImmutable(),
+            $this->id,
         );
     }
 
     public function withEmail(string $email): self
     {
+        if (!Validator::isValidEmail($email)) {
+            throw new \InvalidArgumentException("Invalid email format.");
+        }
+
         return new self(
-            $this->id,
             $this->name,
             $email,
             $this->hashPassword,
             $this->createdAt,
-            new \DateTimeImmutable()
+            new \DateTimeImmutable(),
+            $this->id,
         );
     }
 
     public function withPassword(string $hashPassword): self
     {
         return new self(
-            $this->id,
             $this->name,
             $this->email,
             $hashPassword,
             $this->createdAt,
-            new \DateTimeImmutable()
+            new \DateTimeImmutable(),
+            $this->id,
         );
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
-    public function verifyPassword(string $password): bool
-    {
-        return password_verify($password, $this->hashPassword);
-    }
-
-    public function getCreatedAt(): \DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function getUpdatedAt(): \DateTimeImmutable
-    {
-        return $this->updatedAt;
     }
 
     public function __toString(): string
