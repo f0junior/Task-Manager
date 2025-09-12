@@ -24,13 +24,13 @@ final class InMemoryTaskRepository implements TaskRepositoryInterface
     {
         return array_filter(
             $this->tasks,
-            fn(Task $task) => $task->getUserId() === $userId
+            fn(Task $task) => $task->userId === $userId
         );
     }
 
     public function save(Task $task): Task
     {
-        if ($task->getId() === 0) {
+        if ($task->id === 0) {
             // Simula ID auto increment
             $reflection = new \ReflectionClass($task);
             $property = $reflection->getProperty('id');
@@ -38,7 +38,7 @@ final class InMemoryTaskRepository implements TaskRepositoryInterface
             $property->setValue($task, $this->autoIncrement++);
         }
 
-        $this->tasks[$task->getId()] = $task;
+        $this->tasks[$task->id] = $task;
         return $task;
     }
 

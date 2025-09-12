@@ -22,7 +22,7 @@ final class InMemoryUserRepository implements UserRepositoryInterface
     public function findByEmail(string $email): ?User
     {
         foreach ($this->users as $user) {
-            if ($user->getEmail() === $email) {
+            if ($user->email === $email) {
                 return $user;
             }
         }
@@ -31,7 +31,7 @@ final class InMemoryUserRepository implements UserRepositoryInterface
 
     public function save(User $user): User
     {
-        if ($user->getId() === 0) {
+        if ($user->id === 0) {
             // Simula ID auto increment
             $reflection = new \ReflectionClass($user);
             $property = $reflection->getProperty('id');
@@ -39,7 +39,7 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             $property->setValue($user, $this->autoIncrement++);
         }
 
-        $this->users[$user->getId()] = $user;
+        $this->users[$user->id] = $user;
         return $user;
     }
 
