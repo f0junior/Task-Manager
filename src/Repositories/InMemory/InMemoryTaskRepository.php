@@ -30,12 +30,17 @@ final class InMemoryTaskRepository implements TaskRepositoryInterface
 
     public function save(Task $task): Task
     {
-        if ($task->id === 0) {
+        if ($task->id === null) {
             // Simula ID auto increment
-            $reflection = new \ReflectionClass($task);
-            $property = $reflection->getProperty('id');
-            $property->setAccessible(true);
-            $property->setValue($task, $this->autoIncrement++);
+            $task = Task::fromDatabase(
+                $this->autoIncrement++,
+                $task->title,
+                $task->description,
+                $task->userId,
+                $task->status,
+                $task->createdAt,
+                $task->updatedAt,
+            );
         }
 
         $this->tasks[$task->id] = $task;

@@ -31,12 +31,15 @@ final class InMemoryUserRepository implements UserRepositoryInterface
 
     public function save(User $user): User
     {
-        if ($user->id === 0) {
-            // Simula ID auto increment
-            $reflection = new \ReflectionClass($user);
-            $property = $reflection->getProperty('id');
-            $property->setAccessible(true);
-            $property->setValue($user, $this->autoIncrement++);
+        if ($user->id === null) {
+            $user = User::fromDatabase(
+                $this->autoIncrement++,
+                $user->name,
+                $user->email,
+                $user->hashPassword,
+                $user->createdAt,
+                $user->updatedAt,
+            );
         }
 
         $this->users[$user->id] = $user;
